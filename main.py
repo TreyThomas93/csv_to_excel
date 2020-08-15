@@ -100,7 +100,7 @@ if __name__ == "__main__":
     cell_range = "A1:I500"  # RANGE OF CELLS TO REMOVE AND ADD DATA TO
     ########################################################################
 
-    csv_filename = "StrategyReports_FAMI_81420.csv"
+    csv_filename = "StrategyReports.csv"
 
     new_csv_filename = "StrategyReportsConverted.csv"
 
@@ -115,6 +115,19 @@ if __name__ == "__main__":
     while True:
 
         try:
+
+            for file in os.listdir(os.getcwd()):
+
+                if file.endswith(".csv"):
+
+                    if file != new_csv_filename:
+
+                        new_file_name = file.split('_')
+
+                        if len(new_file_name) > 1:
+
+                            # CHANGE CSV FILENAME
+                            os.rename(file, f"{new_file_name[0].strip()}.csv")
             
             path = csv_filename
 
