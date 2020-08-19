@@ -74,9 +74,75 @@ class CSVToExcel():
 
         self.book.save(self.excel_filename)
 
+    def fixDuplicates(self, df):
+
+        rows_to_delete = []
+
+        for index, row in df.iterrows():
+
+            try:
+
+                current_side = df.loc[index, "Side"]
+
+                next_side = df.loc[index + 1, "Side"]
+
+                third_side = df.loc[index + 2, "Side"]
+
+                current_price = df.loc[index, "Price"]
+
+                next_price = df.loc[index + 1, "Price"]
+
+                third_price = df.loc[index + 2, "Price"]
+
+                current_date = df.loc[index, "Date/Time"]
+
+                next_date = df.loc[index + 1, "Date/Time"]
+
+                third_date = df.loc[index + 2, "Date/Time"]
+
+                sell = "Sell to Close"
+
+                buy = "Buy to Open"
+
+                if current_side == buy and next_side == buy or current_side == sell and next_side == sell:
+
+                    if current_price == third_price:
+
+                        # REMOVE CURRENT INDEX
+                        rows_to_delete.append(index)
+
+                    elif next_price == third_price:
+
+                        # REMOVE LAST INDEX
+                        rows_to_delete.append(index + 1)
+
+                    else:
+
+                        if third_price == df.loc[index + 3, "Price"]:
+
+                            # REMOVE THIRD INDEX
+                            rows_to_delete.append(index + 2)
+
+                        else:
+
+                            # REMOVE LAST INDEX
+                            rows_to_delete.append(index + 1)
+
+            except:
+
+                pass
+
+        fixed = df.drop(rows_to_delete)
+
+        fixed = fixed.reset_index(drop=True)
+
+        return fixed
+
     def addCSVToExcel(self):
 
         df = pd.read_csv(self.new_csv_filename)
+
+        df = self.fixDuplicates(df)
 
         with pd.ExcelWriter(self.excel_filename, engine='openpyxl') as writer:
 
